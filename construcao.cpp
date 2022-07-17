@@ -45,8 +45,6 @@ Solucao ILS :: Construcao(Data& d){
         sort(insertioncost.begin(), insertioncost.end(), comparison);
         double alpha = (double) rand() / RAND_MAX;
         int selecionado = rand() % ((int) ceil(alpha * insertioncost.size()));
-        // cout << "local a ser inserido = " << insertioncost[selecionado].local << endl;
-        // cout << "no a ser inserido = " << CL[insertioncost[selecionado].inserir] << endl << endl; // DEBUG
         chosen = CL[insertioncost[selecionado].inserir];
         s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].local, chosen);
         CL.erase(remove(CL.begin(), CL.end(), chosen), CL.end());
