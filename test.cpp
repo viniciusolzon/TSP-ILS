@@ -81,8 +81,6 @@ Solucao Construcao(Data& d){
         sort(insertioncost.begin(), insertioncost.end(), comparison);
         double alpha = (double) rand() / RAND_MAX;
         int selecionado = rand() % ((int) ceil(alpha * insertioncost.size()));
-        // cout << "local a ser inserido = " << insertioncost[selecionado].local << endl;
-        // cout << "no a ser inserido = " << CL[insertioncost[selecionado].inserir] << endl << endl; // DEBUG
         chosen = CL[insertioncost[selecionado].inserir];
         s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].local, chosen);
         CL.erase(remove(CL.begin(), CL.end(), chosen), CL.end());
@@ -252,6 +250,206 @@ void BuscaLocal(Solucao& s, Data& d){
     }
 }
 
+void clean(vector<int>& available, Solucao& s,  int position, int size){
+    if(s.sequence[position] == s.sequence.front()){
+        available.erase(available.begin() + position, available.begin() + position + size + 1);
+        int max = ceil(s.sequence.size() / 10.0);
+        if(max < 2)
+            max = 2;
+        vector<int> sizes;
+        for(int i = 0; i < max; i++){
+            sizes.push_back(i+2);
+        }
+        random_shuffle(sizes.begin(), sizes.end());
+        int size = sizes.front();
+
+        vector<int> pos;
+        for(int i = 0; i < available.size() - size + 1; i++){
+            pos.push_back(i);
+        }
+        random_shuffle(pos.begin(), pos.end());
+        int position = pos.front();
+        vector<int> second_slice;
+        for(int i = position; i < position + size; i++){
+            second_slice.push_back(available[i]);
+        }
+        cout << "Second slice: ";
+        cout <<   endl << "1" << endl;
+        for(int i = 0; i < second_slice.size(); i++){
+            cout << second_slice[i] << " ";
+        }
+        cout << endl;
+    }
+
+    if(s.sequence[position + size - 1] == s.sequence.back()){
+        available.erase(available.begin() + position - 1, available.begin() + position + size);
+        int max = ceil(s.sequence.size() / 10.0);
+        if(max < 2)
+            max = 2;
+        vector<int> sizes;
+        for(int i = 0; i < max; i++){
+            sizes.push_back(i+2);
+        }
+        random_shuffle(sizes.begin(), sizes.end());
+        int size = sizes.front();
+
+        vector<int> pos;
+        for(int i = 0; i < available.size() - size + 1; i++){
+            pos.push_back(i);
+        }
+        random_shuffle(pos.begin(), pos.end());
+        int position = pos.front();
+        vector<int> second_slice;
+        for(int i = position; i < position + size; i++){
+            second_slice.push_back(available[i]);
+        }
+        cout << "Second slice: ";
+        cout <<  endl <<  "2" << endl;
+        for(int i = 0; i < second_slice.size(); i++){
+            cout << second_slice[i] << " ";
+        }
+        cout << endl;
+    }
+
+    if(s.sequence[position] != s.sequence.front() && s.sequence[position + size - 1] != s.sequence.back()){
+        if(!(position > size) && !(s.sequence.size() - (position + size) > size)){
+            int max = ceil(s.sequence.size() / 10.0);
+            if(max < 2)
+                max = 2;
+            vector<int> sizes;
+            for(int i = 0; i < max; i++){
+                sizes.push_back(i+2);
+            }
+            random_shuffle(sizes.begin(), sizes.end());
+            int size = sizes.front();
+
+            vector<int> pos;
+            for(int i = 0; i < s.sequence.size() - size + 1; i++){
+                pos.push_back(i);
+            }
+            random_shuffle(pos.begin(), pos.end());
+            int position = pos.front();
+
+            vector<int> slice_1;
+            for(int i = position; i < position + size; i++){
+                slice_1.push_back(s.sequence[i]);
+            }
+            // debug
+            cout << "First slice: ";
+            for(int i = 0; i < slice_1.size(); i++){
+                cout << slice_1[i] << " ";
+            }
+            cout << endl;
+            // debug
+
+            vector<int> available = s.sequence;
+            clean(available, s, position, size);
+                    
+        }else{
+            
+            if(position > size){
+                available.erase(available.begin() + position - 1, available.end());
+                int max = ceil(s.sequence.size() / 10.0);
+                if(max < 2)
+                    max = 2;
+                vector<int> sizes;
+                for(int i = 0; i < max; i++){
+                    sizes.push_back(i+2);
+                }
+                random_shuffle(sizes.begin(), sizes.end());
+                int size = sizes.front();
+
+                vector<int> pos;
+                for(int i = 0; i < available.size() - size + 1; i++){
+                    pos.push_back(i);
+                }
+                random_shuffle(pos.begin(), pos.end());
+                int position = pos.front();
+                vector<int> second_slice;
+                for(int i = position; i < position + size; i++){
+                    second_slice.push_back(available[i]);
+                }
+                cout << "Second slice: ";
+                cout <<  endl << "3" << endl;
+                for(int i = 0; i < second_slice.size(); i++){
+                    cout << second_slice[i] << " ";
+                }
+                cout << endl;
+            }
+            
+            if(s.sequence.size() - (position + size) > size){
+                available.erase(available.begin(), available.begin() + position + size + 1);
+                int max = ceil(s.sequence.size() / 10.0);
+                if(max < 2)
+                    max = 2;
+                vector<int> sizes;
+                for(int i = 0; i < max; i++){
+                    sizes.push_back(i+2);
+                }
+                random_shuffle(sizes.begin(), sizes.end());
+                int size = sizes.front();
+            
+                vector<int> pos;
+                for(int i = 0; i < available.size() - size + 1; i++){
+                    pos.push_back(i);
+                }
+                random_shuffle(pos.begin(), pos.end());
+                int position = pos.front();
+                vector<int> second_slice;
+                for(int i = position; i < position + size; i++){
+                    second_slice.push_back(available[i]);
+                }
+                cout << "Second slice: ";
+                cout << endl << "4" << endl;
+                for(int i = 0; i < second_slice.size(); i++){
+                    cout << second_slice[i] << " ";
+                }
+                cout << endl;
+            }
+        }
+    }
+}
+
+void Pertubacao(Solucao& s){
+
+    int max = ceil(s.sequence.size() / 10.0);
+    if(max < 2)
+        max = 2;
+    vector<int> sizes;
+    for(int i = 0; i < max; i++){
+        sizes.push_back(i+2);
+    }
+    random_shuffle(sizes.begin(), sizes.end());
+    int size = sizes.front();
+
+    vector<int> pos;
+    for(int i = 0; i < s.sequence.size() - size + 1; i++){
+        pos.push_back(i);
+    }
+    random_shuffle(pos.begin(), pos.end());
+    int position = pos.front();
+
+    // vector<int> slice_1;
+    // for(int i = position; i < position + size; i++){
+    //     slice_1.push_back(s.sequence[i]);
+    // }
+    // // debug
+    // cout << "First slice: ";
+    // for(int i = 0; i < slice_1.size(); i++){
+    //     cout << slice_1[i] << " ";
+    // }
+    // cout << endl;
+    // debug
+
+    vector<int> available = s.sequence;
+    clean(available, s, position, size);
+    int change = 1;
+    if(change){
+        cout << "deu tudo certo!" << endl;
+        change = 0;
+    }
+}
+
 int main(){
 
     Data d = {{
@@ -277,9 +475,9 @@ int main(){
     exibirSolucao(s1, d);
     cout << endl;
     
-    // Pertubacao();
-    // cout << "- solucao apos Pertubacao() : " << endl;
-    // exibirSolucao(s1, d);
-    // cout << endl;
+    Pertubacao(s1);
+    cout << "- solucao apos Pertubacao() : " << endl;
+    exibirSolucao(s1, d);
+    cout << endl;
 
 }

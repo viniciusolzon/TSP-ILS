@@ -39,7 +39,7 @@ struct ILS{
         bool bestImprovementOrOpt(Solucao &s, Data &d, int amount);
         void BuscaLocal(Solucao& s, Data& d);
         
-        // Perturbacao();
+        vector<int> Pertubacao(Solucao& s);
     
         void exibirSolucao(Solucao& s, Data& d);
         Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls);
