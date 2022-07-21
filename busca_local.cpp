@@ -1,12 +1,10 @@
 #include "ILS.h"
 
-double ILS :: calculateSwapCost(Solucao& s, Data& d, int first, int second){
+double calculateSwapCost(Solucao& s, Data& d, int first, int second){
     vector<int> s_copy = s.sequence;
     double origin, after, cost = 0;
 
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        origin += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
-    }
+    origin = s.cost;
 
     swap(s_copy[first], s_copy[second]);
 
@@ -18,7 +16,7 @@ double ILS :: calculateSwapCost(Solucao& s, Data& d, int first, int second){
     return cost;
 }
 
-bool ILS :: bestImprovementSwap(Solucao &s, Data& d){
+bool bestImprovementSwap(Solucao &s, Data& d){
     double bestcost = 0;
     double cost;
     int best_i, best_j;
@@ -40,7 +38,7 @@ bool ILS :: bestImprovementSwap(Solucao &s, Data& d){
 return false;
 }
 
-double ILS :: calculate2OptCost(Solucao& s, Data& d, int first, int second){
+double calculate2OptCost(Solucao& s, Data& d, int first, int second){
     vector<int> s_copy = s.sequence;
     double origin, after, cost = 0;
 
@@ -58,7 +56,7 @@ double ILS :: calculate2OptCost(Solucao& s, Data& d, int first, int second){
     return cost;
 }
 
-bool ILS :: bestImprovement2Opt(Solucao &s, Data &d){
+bool bestImprovement2Opt(Solucao &s, Data &d){
     double bestcost = 0.0;
     int best_i, best_j;             
 
@@ -80,7 +78,7 @@ bool ILS :: bestImprovement2Opt(Solucao &s, Data &d){
     return false;
 }
 
-double ILS :: calculateOrOptCost(Solucao& s, Data& d, int first, int second, int amount){
+double calculateOrOptCost(Solucao& s, Data& d, int first, int second, int amount){
     vector<int> s_copy = s.sequence;
     vector<int> collection(s_copy.begin() + first, s_copy.begin() + amount + first);
     double origin, after, cost = 0;
@@ -100,7 +98,7 @@ double ILS :: calculateOrOptCost(Solucao& s, Data& d, int first, int second, int
     return cost;
 }
 
-bool ILS :: bestImprovementOrOpt(Solucao &s, Data &d, int amount){
+bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
     double bestcost = 0.0;
     int best_i, best_j;             
 
@@ -108,7 +106,6 @@ bool ILS :: bestImprovementOrOpt(Solucao &s, Data &d, int amount){
         for (int j = i + 1; j < s.sequence.size() - amount; j++){
             double cost = calculateOrOptCost(s, d, i, j, amount);
            
-
             if (cost < bestcost){
                 best_i = i;
                 best_j = j;
@@ -127,8 +124,7 @@ bool ILS :: bestImprovementOrOpt(Solucao &s, Data &d, int amount){
     return false;
 }
 
-
-void ILS :: BuscaLocal(Solucao& s, Data& d){
+void BuscaLocal(Solucao& s, Data& d){
 
     std::vector<int> NL = {1, 2, 3, 4, 5};
 

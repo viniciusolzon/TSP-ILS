@@ -40,7 +40,6 @@ void exibirSolucao(Solucao& s, Data& d){
         cout << s.sequence[i] << " -> ";
     }
     cout << s.sequence.back() << endl;
-    calcularcost(s, d);
     cout << "Cost:  " << s.cost << endl;
 }
 
@@ -54,7 +53,6 @@ Solucao Construcao(Data& d){
     }
 
     CL = V;
-    srand(time(NULL));
     random_shuffle(CL.begin(), CL.end());
 
     for(int i = 0; i < d.vertices/2; i++){
@@ -94,9 +92,7 @@ double calculateSwapCost(Solucao& s, Data& d, int first, int second){
     vector<int> s_copy = s.sequence;
     double origin, after, cost = 0;
 
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        origin += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
-    }
+    origin = s.cost;
 
     swap(s_copy[first], s_copy[second]);
 
@@ -198,7 +194,6 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
         for (int j = i + 1; j < s.sequence.size() - amount; j++){
             double cost = calculateOrOptCost(s, d, i, j, amount);
            
-
             if (cost < bestcost){
                 best_i = i;
                 best_j = j;
@@ -216,7 +211,6 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
 
     return false;
 }
-
 
 void BuscaLocal(Solucao& s, Data& d){
 
@@ -250,204 +244,60 @@ void BuscaLocal(Solucao& s, Data& d){
     }
 }
 
-void clean(vector<int>& available, Solucao& s,  int position, int size){
-    if(s.sequence[position] == s.sequence.front()){
-        available.erase(available.begin() + position, available.begin() + position + size + 1);
-        int max = ceil(s.sequence.size() / 10.0);
-        if(max < 2)
-            max = 2;
-        vector<int> sizes;
-        for(int i = 0; i < max; i++){
-            sizes.push_back(i+2);
-        }
-        random_shuffle(sizes.begin(), sizes.end());
-        int size = sizes.front();
+vector<int> Pertubacao(Solucao& s){
+    Solucao best = s;
+    int lim = ceil(best.sequence.size() / 10.0);
+    int size1 = max(2, rand() % lim);
+    int start1 = rand() % (best.sequence.size() - size1 + 1);
+    int end1 = start1 + size1 - 1;
+    int size2 = max(2, rand() % lim);
+    int start2 = rand() % (best.sequence.size() - size2 + 1);
+    int end2 = start2 + size2 - 1;
 
-        vector<int> pos;
-        for(int i = 0; i < available.size() - size + 1; i++){
-            pos.push_back(i);
-        }
-        random_shuffle(pos.begin(), pos.end());
-        int position = pos.front();
-        vector<int> second_slice;
-        for(int i = position; i < position + size; i++){
-            second_slice.push_back(available[i]);
-        }
-        cout << "Second slice: ";
-        cout <<   endl << "1" << endl;
-        for(int i = 0; i < second_slice.size(); i++){
-            cout << second_slice[i] << " ";
-        }
-        cout << endl;
+    while(end1 + 1 >= start2 || start1 < 1 || start2 < 1 || end1 == best.sequence.size() - 1 || end2 == best.sequence.size() - 1){
+        size1 = max(2, rand() % lim);
+        start1 = rand() % (best.sequence.size() - size1 + 1);
+        end1 = start1 + size1 - 1;
+        size2 = max(2, rand() % lim);
+        start2 = rand() % (best.sequence.size() - size2 + 1);
+        end2 = start2 + size2 - 1;
     }
 
-    if(s.sequence[position + size - 1] == s.sequence.back()){
-        available.erase(available.begin() + position - 1, available.begin() + position + size);
-        int max = ceil(s.sequence.size() / 10.0);
-        if(max < 2)
-            max = 2;
-        vector<int> sizes;
-        for(int i = 0; i < max; i++){
-            sizes.push_back(i+2);
-        }
-        random_shuffle(sizes.begin(), sizes.end());
-        int size = sizes.front();
+    best.sequence.erase(best.sequence.begin() + start1, best.sequence.begin() + start1 + size1);
+    best.sequence.erase(best.sequence.begin() + start2 - size1, best.sequence.begin() + start2 - size1 + size2);
+    for(int i = 0; i < size1; i++)
+        best.sequence.insert(best.sequence.begin() + start1 + i, s.sequence[start2 + i]);
+    for(int i = 0; i < size2; i++)
+        best.sequence.insert(best.sequence.begin() + start2 + i, s.sequence[start1 + i]);
 
-        vector<int> pos;
-        for(int i = 0; i < available.size() - size + 1; i++){
-            pos.push_back(i);
-        }
-        random_shuffle(pos.begin(), pos.end());
-        int position = pos.front();
-        vector<int> second_slice;
-        for(int i = position; i < position + size; i++){
-            second_slice.push_back(available[i]);
-        }
-        cout << "Second slice: ";
-        cout <<  endl <<  "2" << endl;
-        for(int i = 0; i < second_slice.size(); i++){
-            cout << second_slice[i] << " ";
-        }
-        cout << endl;
-    }
-
-    if(s.sequence[position] != s.sequence.front() && s.sequence[position + size - 1] != s.sequence.back()){
-        if(!(position > size) && !(s.sequence.size() - (position + size) > size)){
-            int max = ceil(s.sequence.size() / 10.0);
-            if(max < 2)
-                max = 2;
-            vector<int> sizes;
-            for(int i = 0; i < max; i++){
-                sizes.push_back(i+2);
-            }
-            random_shuffle(sizes.begin(), sizes.end());
-            int size = sizes.front();
-
-            vector<int> pos;
-            for(int i = 0; i < s.sequence.size() - size + 1; i++){
-                pos.push_back(i);
-            }
-            random_shuffle(pos.begin(), pos.end());
-            int position = pos.front();
-
-            vector<int> slice_1;
-            for(int i = position; i < position + size; i++){
-                slice_1.push_back(s.sequence[i]);
-            }
-            // debug
-            cout << "First slice: ";
-            for(int i = 0; i < slice_1.size(); i++){
-                cout << slice_1[i] << " ";
-            }
-            cout << endl;
-            // debug
-
-            vector<int> available = s.sequence;
-            clean(available, s, position, size);
-                    
-        }else{
-            
-            if(position > size){
-                available.erase(available.begin() + position - 1, available.end());
-                int max = ceil(s.sequence.size() / 10.0);
-                if(max < 2)
-                    max = 2;
-                vector<int> sizes;
-                for(int i = 0; i < max; i++){
-                    sizes.push_back(i+2);
-                }
-                random_shuffle(sizes.begin(), sizes.end());
-                int size = sizes.front();
-
-                vector<int> pos;
-                for(int i = 0; i < available.size() - size + 1; i++){
-                    pos.push_back(i);
-                }
-                random_shuffle(pos.begin(), pos.end());
-                int position = pos.front();
-                vector<int> second_slice;
-                for(int i = position; i < position + size; i++){
-                    second_slice.push_back(available[i]);
-                }
-                cout << "Second slice: ";
-                cout <<  endl << "3" << endl;
-                for(int i = 0; i < second_slice.size(); i++){
-                    cout << second_slice[i] << " ";
-                }
-                cout << endl;
-            }
-            
-            if(s.sequence.size() - (position + size) > size){
-                available.erase(available.begin(), available.begin() + position + size + 1);
-                int max = ceil(s.sequence.size() / 10.0);
-                if(max < 2)
-                    max = 2;
-                vector<int> sizes;
-                for(int i = 0; i < max; i++){
-                    sizes.push_back(i+2);
-                }
-                random_shuffle(sizes.begin(), sizes.end());
-                int size = sizes.front();
-            
-                vector<int> pos;
-                for(int i = 0; i < available.size() - size + 1; i++){
-                    pos.push_back(i);
-                }
-                random_shuffle(pos.begin(), pos.end());
-                int position = pos.front();
-                vector<int> second_slice;
-                for(int i = position; i < position + size; i++){
-                    second_slice.push_back(available[i]);
-                }
-                cout << "Second slice: ";
-                cout << endl << "4" << endl;
-                for(int i = 0; i < second_slice.size(); i++){
-                    cout << second_slice[i] << " ";
-                }
-                cout << endl;
-            }
-        }
-    }
+    return best.sequence;
 }
 
-void Pertubacao(Solucao& s){
-
-    int max = ceil(s.sequence.size() / 10.0);
-    if(max < 2)
-        max = 2;
-    vector<int> sizes;
-    for(int i = 0; i < max; i++){
-        sizes.push_back(i+2);
+Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
+    srand(time(NULL));
+    Solucao bestOfAll;
+    bestOfAll.cost = INFINITY;
+    for(int i = 0; i < maxIter; i++){
+        Solucao s = Construcao(d);
+        calcularcost(s, d);
+        Solucao best = s;
+        int iterIls = 0;
+        while(iterIls <= maxIterIls){
+            BuscaLocal(s, d);
+            calcularcost(s, d);
+            if(s.cost < best.cost){
+                best = s;
+                iterIls = 0;
+            }
+            s.sequence = Pertubacao(best);
+            calcularcost(s, d);
+            iterIls++;
+        }
+        if (best.cost < bestOfAll.cost){
+            bestOfAll = best;
+        }
     }
-    random_shuffle(sizes.begin(), sizes.end());
-    int size = sizes.front();
-
-    vector<int> pos;
-    for(int i = 0; i < s.sequence.size() - size + 1; i++){
-        pos.push_back(i);
-    }
-    random_shuffle(pos.begin(), pos.end());
-    int position = pos.front();
-
-    // vector<int> slice_1;
-    // for(int i = position; i < position + size; i++){
-    //     slice_1.push_back(s.sequence[i]);
-    // }
-    // // debug
-    // cout << "First slice: ";
-    // for(int i = 0; i < slice_1.size(); i++){
-    //     cout << slice_1[i] << " ";
-    // }
-    // cout << endl;
-    // debug
-
-    vector<int> available = s.sequence;
-    clean(available, s, position, size);
-    int change = 1;
-    if(change){
-        cout << "deu tudo certo!" << endl;
-        change = 0;
-    }
+    return bestOfAll;
 }
 
 int main(){
@@ -461,23 +311,6 @@ int main(){
         {1, 2 ,6, 5, 2, 0}
     }, 6};
 
-    // Solucao s = {{5, 6, 2, 1, 3, 4, 5}, 0};
-    // exibirSolucao(s, d);
-
-    Solucao s1;
-    s1 = Construcao(d);
-    cout << "- solucao apos Construcao() : " << endl;
+    Solucao s1 = solve(s1, d, 50, 6);
     exibirSolucao(s1, d);
-    cout << endl;
-    
-    BuscaLocal(s1, d);
-    cout << "- solucao apos BuscaLocal() : " << endl;
-    exibirSolucao(s1, d);
-    cout << endl;
-    
-    Pertubacao(s1);
-    cout << "- solucao apos Pertubacao() : " << endl;
-    exibirSolucao(s1, d);
-    cout << endl;
-
 }

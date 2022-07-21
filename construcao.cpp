@@ -2,13 +2,11 @@
 
 #include "ILS.h"
 
-using namespace std;
-
-bool ILS :: comparison(const InsertionInfo& a, const InsertionInfo& b){
+bool comparison(const InsertionInfo& a, const InsertionInfo& b){
     return a.cost < b.cost;
 }
 
-Solucao ILS :: Construcao(Data& d){
+Solucao Construcao(Data& d){
     Solucao s;
     vector<int> V;
     vector<int> CL;
@@ -18,7 +16,6 @@ Solucao ILS :: Construcao(Data& d){
     }
 
     CL = V;
-    srand(time(NULL));
     random_shuffle(CL.begin(), CL.end());
 
     for(int i = 0; i < d.vertices/2; i++){
