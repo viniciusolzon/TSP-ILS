@@ -2,18 +2,17 @@
 #include "construcao.cpp"
 #include "busca_local.cpp"
 #include "pertubacao.cpp"
+#include "readData.h"
 
-int main(){
+int main(int argc, char* argv[]){
 
-    Data d = {{
-        {0, 2, 1, 4, 9, 1},
-        {2, 0, 5, 9, 7, 2},
-        {1, 5, 0, 3, 8, 6},
-        {4, 9, 3, 0, 2, 5},
-        {9, 7, 8, 2, 0, 2},
-        {1, 2 ,6, 5, 2, 0}
-    }, 6};
+    double ** matrizAdj;
+    int dimension;
 
-    Solucao s1 = solve(s1, d, 50, 6);
+    readData(argc, argv, &dimension, &matrizAdj);
+
+    Data d = {matrizAdj, dimension};
+
+    Solucao s1 = solve(s1, d, 50, 14);
     exibirSolucao(s1, d);
 }

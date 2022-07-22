@@ -2,12 +2,10 @@
 
 #include "ILS.h"
 
-#define INFINITY 999999999;
-
 void calcularcost(Solucao& s, Data& d){
     s.cost = 0;
     for(int i = 0; i < s.sequence.size() - 1; i++){
-        s.cost += d.matrizAdj[s.sequence[i]-1][s.sequence[i+1]-1];
+        s.cost += d.matrizAdj[s.sequence[i]][s.sequence[i+1]];
     }
 }
 
@@ -29,7 +27,7 @@ Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
         calcularcost(s, d);
         Solucao best = s;
         int iterIls = 0;
-        cout << "Iteração:    " << i + 1 << std:: endl; // debug
+        cout << "Iteração:      " << i + 1 << std:: endl; // debug
         while(iterIls <= maxIterIls){
             BuscaLocal(s, d);
             calcularcost(s, d);

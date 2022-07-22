@@ -9,7 +9,7 @@
 using namespace std;
 
 struct Data{
-    vector<vector<int>> matrizAdj;
+    double** matrizAdj;
     int vertices;
 };
 

@@ -12,7 +12,7 @@ Solucao Construcao(Data& d){
     vector<int> CL;
 
     for (int i = 1; i <= d.vertices; i++){
-        V.push_back(i);                             
+        V.push_back(i);
     }
 
     CL = V;
