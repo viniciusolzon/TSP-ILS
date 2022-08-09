@@ -1,7 +1,7 @@
 #include "ILS.cpp"
 #include "construcao.cpp"
 #include "busca_local.cpp"
-#include "pertubacao.cpp"
+#include "perturbacao.cpp"
 #include "readData.h"
 
 int main(int argc, char* argv[]){
@@ -13,6 +13,11 @@ int main(int argc, char* argv[]){
 
     Data d = {matrizAdj, dimension};
 
-    Solucao s1 = solve(s1, d, 50, 14);
-    exibirSolucao(s1, d);
+    Solucao s = solve(s, d, 50, 48);
+    exibirSolucao(s, d);
 }
+
+/*  - Construção: OK
+    - Busca Local: OK
+    - Pertubacao: Falta pertubar as pontas e já atualizar o custo
+*/

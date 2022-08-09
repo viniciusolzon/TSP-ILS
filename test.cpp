@@ -4,31 +4,41 @@
 #include <time.h>
 #include <algorithm>
 #include <cmath>
+// #include <limits>    Precisa mesmo?
+#include <chrono>
 
 using namespace std;
 
 struct Data{
-    vector<vector<int>> matrizAdj;
+    vector<vector<double>> matrizAdj;
     int vertices;
 };
 
 struct Solucao{
-    vector<int> sequence;
-    double cost;
+    vector<int> sequence = {};
+    double cost = 0.0;
 };
 
 struct InsertionInfo{
-    int inserir;
-    int local;
-    double cost;
+    int inserir = 0;
+    int remover = 0;
+    double cost = 0.0;
 };
 
 bool comparison(const InsertionInfo& a, const InsertionInfo& b){
     return a.cost < b.cost;
 }
 
+double epsilon(double a, double b) {
+    return fabs(a + b) * numeric_limits<double>::epsilon() * 15;
+};
+
+bool improve(double value_1, double value_2) {
+    return (value_1 - value_2) > epsilon(value_1, value_2);
+}
+
 void calcularcost(Solucao& s, Data& d){
-    s.cost = 0;
+    s.cost = 0.0;
     for(int i = 0; i < s.sequence.size() - 1; i++){
         s.cost += d.matrizAdj[s.sequence[i]-1][s.sequence[i+1]-1];
     }
@@ -39,118 +49,108 @@ void exibirSolucao(Solucao& s, Data& d){
     for(int i = 0; i < s.sequence.size() - 1; i++){
         cout << s.sequence[i] << " -> ";
     }
-    cout << s.sequence.back() << endl;
-    cout << "Cost:  " << s.cost << endl;
+    cout << s.sequence.back() << "\n";
+    cout << "Cost:  " << setprecision(2) << fixed << s.cost << "\n";
 }
 
 Solucao Construcao(Data& d){
     Solucao s;
-    vector<int> V;
     vector<int> CL;
 
     for (int i = 1; i <= d.vertices; i++){
-        V.push_back(i);                             
+        CL.push_back(i);
     }
 
-    CL = V;
     random_shuffle(CL.begin(), CL.end());
-
-    for(int i = 0; i < d.vertices/2; i++){
+    for(int i = 0; i < 3; i++){
         s.sequence.push_back(CL[i]);
-        CL.erase(remove(CL.begin(), CL.end(), CL[i]), CL.end());
+        CL.erase(CL.begin() + i);
     }
+    s.sequence.push_back(s.sequence[0]);
     
     int chosen;
     while(!CL.empty()){
         vector<InsertionInfo> insertioncost ((s.sequence.size() - 1) * CL.size());
-        int i, l = 0;
-
-        for(int a = 0, b = 1; a < s.sequence.size() - 1; a++, b++){
+        
+        for(int a = 0, b = 1, l = 0; a < s.sequence.size() - 1; a++, b++){
             int i = s.sequence[a];
             int j = s.sequence[b];
 
             for (int k = 0; k < CL.size(); k++){
-                insertioncost[l].cost = d.matrizAdj[i-1][k] + d.matrizAdj[j-1][k] - d.matrizAdj[i-1][j-1];
+                insertioncost[l].cost = d.matrizAdj[i -1][CL[k] - 1] + d.matrizAdj[j - 1][CL[k] - 1] - d.matrizAdj[i - 1][j - 1];
                 insertioncost[l].inserir = k;
-                insertioncost[l].local = a;
+                insertioncost[l].remover = a;
                 l++;
             }
         }
         sort(insertioncost.begin(), insertioncost.end(), comparison);
         double alpha = (double) rand() / RAND_MAX;
         int selecionado = rand() % ((int) ceil(alpha * insertioncost.size()));
+        selecionado = selecionado != 0 ? rand() % (selecionado) : 0;
         chosen = CL[insertioncost[selecionado].inserir];
-        s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].local, chosen);
-        CL.erase(remove(CL.begin(), CL.end(), chosen), CL.end());
+        s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].remover + 1, chosen);
+        CL.erase(CL.begin() + insertioncost[selecionado].inserir);
     }
-    int last_vertice = s.sequence[0];
-    s.sequence.push_back(last_vertice);
     return s;
 }
 
 double calculateSwapCost(Solucao& s, Data& d, int first, int second){
-    vector<int> s_copy = s.sequence;
-    double origin, after, cost = 0;
-
-    origin = s.cost;
-
-    swap(s_copy[first], s_copy[second]);
-
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        after += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
+    double origin = 0.0, after = 0.0, cost = 0.0;
+    if(second == first + 1){
+        origin = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[second] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[second] - 1][s.sequence[second + 1] - 1];
+        after = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[second] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first] - 1][s.sequence[second + 1] - 1];
+        cost = after - origin;
     }
-
-    cost = after - origin;
+    else{
+        origin = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first + 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[second - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[second + 1] - 1][s.sequence[second] - 1];
+        after = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[first + 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[second - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[second + 1] - 1][s.sequence[first] - 1];
+        cost = after - origin;
+    }
     return cost;
 }
 
 bool bestImprovementSwap(Solucao &s, Data& d){
-    double bestcost = 0;
-    double cost;
-    int best_i, best_j;
-    for(int i = 1; i < s.sequence.size() - 1; i++){
+    double bestcost = 0.0;
+    double cost = 0.0;
+    int best_i = 0, best_j = 0;
+    for(int i = 1; i < s.sequence.size() - 2; i++){
         for(int j = i + 1; j < s.sequence.size() - 1; j++){
             cost = calculateSwapCost(s, d, i, j);
-            if (cost < bestcost){
+            if(improve(bestcost, cost)){
                 bestcost = cost;
                 best_i = i;
                 best_j = j;
+
             }
         }
     }
     if(bestcost < 0){
-        swap(s.sequence[best_i], s.sequence[best_j]);
-        s.cost = s.cost - cost;
+        int aux = s.sequence[best_i];
+        s.sequence[best_i] = s.sequence[best_j];
+        s.sequence[best_j] = aux;
+        s.cost += bestcost;
         return true;
     }
-return false;
+
+    return false;
 }
 
 double calculate2OptCost(Solucao& s, Data& d, int first, int second){
-    vector<int> s_copy = s.sequence;
-    double origin, after, cost = 0;
-
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        origin += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
-    }
-
-    reverse(s_copy.begin() + first, s_copy.begin() + second + 1);
-
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        after += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
-    }
-
+    double origin = 0.0, after = 0.0, cost = 0.0;
+    origin = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[second] - 1][s.sequence[second + 1] - 1];
+    after = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[first] - 1][s.sequence[second + 1] - 1];
     cost = after - origin;
+
     return cost;
 }
 
 bool bestImprovement2Opt(Solucao &s, Data &d){
-    double bestcost = 0.0;
+    double bestcost = 0.0, cost = 0.0;
     int best_i, best_j;             
 
-    for (int i = 1; i < s.sequence.size() - 1; i++){
-        for (int j = i + 1; j < s.sequence.size() - 1; j++){
-            double cost = calculate2OptCost(s, d, i, j);
+    for(int i = 1; i < s.sequence.size() - 2; i++){
+        for(int j = i + 1; j < s.sequence.size() - 1; j++){
+            cost = calculate2OptCost(s, d, i, j);
             if (cost < bestcost){
                 best_i = i;
                 best_j = j;
@@ -158,8 +158,10 @@ bool bestImprovement2Opt(Solucao &s, Data &d){
             }
         }
     }
-    if (bestcost < 0){
+    if(bestcost < 0){
         reverse(s.sequence.begin() + best_i, s.sequence.begin() + best_j + 1);
+
+        s.cost+=bestcost;
         return true;
     }
 
@@ -167,34 +169,33 @@ bool bestImprovement2Opt(Solucao &s, Data &d){
 }
 
 double calculateOrOptCost(Solucao& s, Data& d, int first, int second, int amount){
-    vector<int> s_copy = s.sequence;
-    vector<int> collection(s_copy.begin() + first, s_copy.begin() + amount + first);
-    double origin, after, cost = 0;
-
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        origin += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
+    double origin = 0.0, after = 0.0, cost = 0.0;
+    if(first > second){
+        origin = d.matrizAdj[s.sequence[second - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first + amount - 1] - 1][s.sequence[first + amount] - 1];
+        after = d.matrizAdj[s.sequence[second - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first + amount - 1] - 1][s.sequence[second] - 1] + d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first + amount] - 1];
     }
-
-    s_copy.erase(s_copy.begin() + first, s_copy.begin() + amount + first);
-    s_copy.insert(s_copy.begin() + second, collection.begin(), collection.end());
-
-    for(int i = 0; i < s.sequence.size() - 1; i++){
-        after += d.matrizAdj[s_copy[i]-1][s_copy[i+1]-1];
+    else{
+        origin = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first + amount - 1] - 1][s.sequence[first + amount] - 1] + d.matrizAdj[s.sequence[second + amount - 1] - 1][s.sequence[second + amount] - 1];
+        after = d.matrizAdj[s.sequence[first - 1] - 1][s.sequence[first + amount] - 1] + d.matrizAdj[s.sequence[second + amount - 1] - 1][s.sequence[first] - 1] + d.matrizAdj[s.sequence[first + amount - 1] - 1][s.sequence[second + amount] - 1];
     }
-
     cost = after - origin;
+
     return cost;
 }
 
 bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
-    double bestcost = 0.0;
-    int best_i, best_j;             
-
+    int count = 0;
+    double bestcost = 0.0, cost = 0.0;
+    int best_i = 0, best_j = 0;
     for (int i = 1; i < s.sequence.size() - amount; i++){
-        for (int j = i + 1; j < s.sequence.size() - amount; j++){
-            double cost = calculateOrOptCost(s, d, i, j, amount);
-           
-            if (cost < bestcost){
+        for (int j = 1; j < s.sequence.size() - amount; j++){
+            if(i == j){
+                cost = 0.0;
+            }
+            else{
+                cost = calculateOrOptCost(s, d, i, j, amount);
+            }
+            if(improve(bestcost, cost)){
                 best_i = i;
                 best_j = j;
                 bestcost = cost;
@@ -202,10 +203,13 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
         }
     }
 
-    if (bestcost < 0){
-        vector<int> collection(s.sequence.begin() + best_i, s.sequence.begin() + amount + best_i);
-        s.sequence.erase(s.sequence.begin() + best_i, s.sequence.begin() + amount + best_i);
-        s.sequence.insert(s.sequence.begin() + best_j, collection.begin(), collection.end());
+    if(bestcost < 0){
+        vector<int> bloco(s.sequence.begin() + best_i, s.sequence.begin() + best_i  + amount);
+        s.sequence.erase(s.sequence.begin() + best_i, s.sequence.begin() + best_i + amount);
+        s.sequence.insert(s.sequence.begin() + best_j, bloco.begin(), bloco.end());
+
+        s.cost+=bestcost;
+
         return true;
     }
 
@@ -213,14 +217,11 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
 }
 
 void BuscaLocal(Solucao& s, Data& d){
-
-    std::vector<int> NL = {1, 2, 3, 4, 5};
-
+    vector<int> NL = {1, 2, 3, 4, 5};
     bool improved = false;
-
-    while (NL.empty() == false){
+    while (!NL.empty()){
         int n = rand() % NL.size();
-        switch (NL[n]){
+        switch(NL[n]){
             case 1:
                 improved = bestImprovementSwap(s, d);
                 break;
@@ -228,19 +229,19 @@ void BuscaLocal(Solucao& s, Data& d){
                 improved = bestImprovement2Opt(s, d);
                 break;
             case 3:
-                improved = bestImprovementOrOpt(s, d, 1); // Reinsertion
+                improved = bestImprovementOrOpt(s, d, 1);
                 break;
             case 4:
-                improved = bestImprovementOrOpt(s, d, 2); // Reinsertion: 2 vertices
+                improved = bestImprovementOrOpt(s, d, 2);
                 break;
             case 5:
-                improved = bestImprovementOrOpt(s, d, 3); // Reinsertion: 3 vertices
+                improved = bestImprovementOrOpt(s, d, 3);
                 break;
         }
-            if(improved)
-                NL = {1, 2, 3, 4, 5};
-            else
-                NL.erase(NL.begin() + n);
+        if(improved)
+            NL = {1, 2, 3, 4, 5};
+        else
+            NL.erase(NL.begin() + n);
     }
 }
 
@@ -274,43 +275,60 @@ vector<int> Pertubacao(Solucao& s){
 }
 
 Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
+    auto start = std::chrono::high_resolution_clock::now();
     srand(time(NULL));
     Solucao bestOfAll;
-    bestOfAll.cost = INFINITY;
     for(int i = 0; i < maxIter; i++){
         Solucao s = Construcao(d);
         calcularcost(s, d);
         Solucao best = s;
+        if (i == 0){
+            bestOfAll.sequence = s.sequence;
+            bestOfAll.cost = s.cost;
+        }
         int iterIls = 0;
+        cout << "Iteração:      " << i + 1 << "\n"; // debug
         while(iterIls <= maxIterIls){
             BuscaLocal(s, d);
-            calcularcost(s, d);
-            if(s.cost < best.cost){
-                best = s;
+            if(improve(best.cost, s.cost)){
+                best.sequence = s.sequence;
+                best.cost = s.cost;
                 iterIls = 0;
             }
-            s.sequence = Pertubacao(best);
-            calcularcost(s, d);
+            // s.sequence = Pertubacao(best);
+            // calcularcost(s, d);
             iterIls++;
         }
-        if (best.cost < bestOfAll.cost){
-            bestOfAll = best;
+        if (improve(bestOfAll.cost, best.cost)){
+            bestOfAll.sequence = best.sequence;
+            bestOfAll.cost = best.cost;
         }
     }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> float_ms = end - start;
+    cout << "\nExecution time:  " << float_ms.count() / 1000.0000000000000 << " seconds" << "\n";
+    cout << "Sequence size:  " << bestOfAll.sequence.size() - 1 << "\n";
     return bestOfAll;
 }
 
 int main(){
-
+    srand(time(NULL));
+    
     Data d = {{
-        {0, 2, 1, 4, 9, 1},
-        {2, 0, 5, 9, 7, 2},
-        {1, 5, 0, 3, 8, 6},
-        {4, 9, 3, 0, 2, 5},
-        {9, 7, 8, 2, 0, 2},
-        {1, 2 ,6, 5, 2, 0}
-    }, 6};
-
-    Solucao s1 = solve(s1, d, 50, 6);
-    exibirSolucao(s1, d);
+        {0.0, 2.0, 1.0, 4.0, 9.0, 1.0, 3.0, 4.0, 8.0, 7.0, 5.0, 1.0},
+        {2.0, 0.0, 5.0, 9.0, 7.0, 2.0, 6.0, 1.0, 3.0, 1.0, 2.0, 2.0},
+        {1.0, 5.0, 0.0, 3.0, 8.0, 6.0, 2.0, 8.0, 9.0, 6.0, 4.0, 3.0},
+        {4.0, 9.0, 3.0, 0.0, 2.0, 5.0, 7.0, 9.0, 2.0, 3.0, 6.0, 1.0},
+        {9.0, 7.0, 8.0, 2.0, 0.0, 2.0, 5.0, 1.0, 5.0, 4.0, 8.0, 9.0},
+        {1.0, 2.0 ,6.0, 5.0, 2.0, 0.0, 3.0, 6.0, 2.0, 4.0, 8.0, 1.0},
+        {3.0, 6.0, 2.0, 7.0, 5.0, 3.0, 0.0, 5.0, 1.0, 2.0, 4.0, 3.0},
+        {4.0, 1.0, 8.0, 9.0, 1.0, 6.0, 5.0, 0.0, 4.0, 5.0, 7.0, 3.0},
+        {8.0, 3.0, 9.0, 2.0, 5.0, 2.0, 1.0, 4.0, 0.0, 6.0, 3.0, 8.0},
+        {7.0, 1.0, 6.0, 3.0, 4.0, 4.0, 2.0, 5.0, 6.0, 0.0, 5.0, 1.0},
+        {5.0, 2.0, 4.0, 6.0, 8.0, 8.0, 4.0, 7.0, 3.0, 5.0, 0.0, 2.0},
+        {1.0, 2.0, 3.0, 1.0, 9.0, 1.0, 3.0, 3.0, 8.0, 1.0, 2.0, 0.0}
+    }, 12};
+    
+    Solucao s = solve(s, d, 50, 12);
+    exibirSolucao(s, d);
 }

@@ -2,8 +2,16 @@
 
 #include "ILS.h"
 
+double epsilon(double a, double b){
+    return fabs(a + b) * numeric_limits<double>::epsilon() * 15;
+};
+
+bool improve(double value_1, double value_2){
+    return (value_1 - value_2) > epsilon(value_1, value_2);
+}
+
 void calcularcost(Solucao& s, Data& d){
-    s.cost = 0;
+    s.cost = 0.0;
     for(int i = 0; i < s.sequence.size() - 1; i++){
         s.cost += d.matrizAdj[s.sequence[i]][s.sequence[i+1]];
     }
@@ -15,33 +23,44 @@ void exibirSolucao(Solucao& s, Data& d){
         cout << s.sequence[i] << " -> ";
     }
     cout << s.sequence.back() << endl;
-    cout << "Cost:  " << s.cost << endl;
+    cout << "Cost:  " << setprecision(2) << fixed << s.cost << "\n";
 }
 
 Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
+    auto start = std::chrono::high_resolution_clock::now();
     srand(time(NULL));
     Solucao bestOfAll;
-    bestOfAll.cost = INFINITY;
     for(int i = 0; i < maxIter; i++){
         Solucao s = Construcao(d);
         calcularcost(s, d);
         Solucao best = s;
+        if(i == 0){
+            // bestOfAll.sequence = s.sequence;
+            // bestOfAll.cost = s.cost;
+            bestOfAll = s;
+        }
         int iterIls = 0;
-        cout << "Iteração:      " << i + 1 << std:: endl; // debug
+        cout << "Iteração:      " << i + 1 << "\n"; // debug
         while(iterIls <= maxIterIls){
             BuscaLocal(s, d);
-            calcularcost(s, d);
-            if(s.cost < best.cost){
+            if(improve(best.cost, s.cost)){
+                // best.sequence = s.sequence;
+                // best.cost = s.cost;
                 best = s;
                 iterIls = 0;
             }
-            s.sequence = Pertubacao(best);
-            calcularcost(s, d);
+            // s.sequence = Pertubacao(best);
+            // calcularcost(s, d);
             iterIls++;
         }
-        if (best.cost < bestOfAll.cost){
-            bestOfAll = best;
+        if (improve(bestOfAll.cost, best.cost)){
+            bestOfAll.sequence = best.sequence;
+            bestOfAll.cost = best.cost;
         }
     }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> float_ms = end - start;
+    cout << "\nExecution time:  " << float_ms.count() / 1000.0000000000000 << " seconds" << "\n";
+    cout << "Sequence size:  " << bestOfAll.sequence.size() - 1 << "\n";
     return bestOfAll;
 }

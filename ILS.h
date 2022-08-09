@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <ctime>
 #include <iostream>
+#include <iomanip>
+#include <chrono>
 
 using namespace std;
 
@@ -20,9 +22,13 @@ struct Solucao{
 
 struct InsertionInfo{
     int inserir;
-    int local;
-    double cost;
+    int remover;
+    double cost = 0.0;
 };
+
+double epsilon(double a, double b);
+
+bool improve(double value_1, double value_2);
 
 void calcularcost(Solucao& s, Data& d);
 

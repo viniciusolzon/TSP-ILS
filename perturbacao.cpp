@@ -2,6 +2,7 @@
 
 vector<int> Pertubacao(Solucao& s){
     Solucao best = s;
+    s.sequence.pop_back();
     int lim = ceil(best.sequence.size() / 10.0);
     int size1 = max(2, rand() % lim);
     int start1 = rand() % (best.sequence.size() - size1 + 1);
@@ -26,5 +27,6 @@ vector<int> Pertubacao(Solucao& s){
     for(int i = 0; i < size2; i++)
         best.sequence.insert(best.sequence.begin() + start2 + i, s.sequence[start1 + i]);
 
+    s.sequence.push_back(s.sequence[0]);
     return best.sequence;
 }

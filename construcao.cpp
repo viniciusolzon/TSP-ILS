@@ -8,45 +8,45 @@ bool comparison(const InsertionInfo& a, const InsertionInfo& b){
 
 Solucao Construcao(Data& d){
     Solucao s;
-    vector<int> V;
     vector<int> CL;
 
     for (int i = 1; i <= d.vertices; i++){
-        V.push_back(i);
+        CL.push_back(i);
     }
 
-    CL = V;
     random_shuffle(CL.begin(), CL.end());
-
-    for(int i = 0; i < d.vertices/2; i++){
+    for(int i = 0; i < 3; i++){
         s.sequence.push_back(CL[i]);
-        CL.erase(remove(CL.begin(), CL.end(), CL[i]), CL.end());
+        CL.erase(CL.begin() + i);
     }
-    
+    s.sequence.push_back(s.sequence[0]);
+
     int chosen;
     while(!CL.empty()){
         vector<InsertionInfo> insertioncost ((s.sequence.size() - 1) * CL.size());
-        int i, l = 0;
-
-        for(int a = 0, b = 1; a < s.sequence.size() - 1; a++, b++){
+        
+        for(int a = 0, b = 1, l = 0; a < s.sequence.size() - 1; a++, b++){
             int i = s.sequence[a];
             int j = s.sequence[b];
 
             for (int k = 0; k < CL.size(); k++){
-                insertioncost[l].cost = d.matrizAdj[i-1][k] + d.matrizAdj[j-1][k] - d.matrizAdj[i-1][j-1];
+                insertioncost[l].cost = d.matrizAdj[i][CL[k]] + d.matrizAdj[j][CL[k]] - d.matrizAdj[i][j];
                 insertioncost[l].inserir = k;
-                insertioncost[l].local = a;
+                insertioncost[l].remover = a;
                 l++;
             }
         }
         sort(insertioncost.begin(), insertioncost.end(), comparison);
         double alpha = (double) rand() / RAND_MAX;
         int selecionado = rand() % ((int) ceil(alpha * insertioncost.size()));
+        // cout << "Selecionado antes: " << selecionado << "\n";
+        selecionado = selecionado != 0 ? rand() % (selecionado) : 0;
+        // cout << "Selecionado depois: " << selecionado << "\n";
+        // cout << "Inserir esse indice: " << insertioncost[selecionado].inserir << "\n";
+        // cout << "Inserir esse valor: " << CL[insertioncost[selecionado].inserir] << "\n";
         chosen = CL[insertioncost[selecionado].inserir];
-        s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].local, chosen);
-        CL.erase(remove(CL.begin(), CL.end(), chosen), CL.end());
+        s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].remover + 1, chosen);
+        CL.erase(CL.begin() + insertioncost[selecionado].inserir);
     }
-    int last_vertice = s.sequence[0];
-    s.sequence.push_back(last_vertice);
     return s;
 }
