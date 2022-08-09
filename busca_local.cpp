@@ -108,9 +108,9 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
     }
 
     if(bestcost < 0){
-        vector<int> bloco(s.sequence.begin() + best_i, s.sequence.begin() + best_i  + amount);
+        vector<int> section(s.sequence.begin() + best_i, s.sequence.begin() + best_i  + amount);
         s.sequence.erase(s.sequence.begin() + best_i, s.sequence.begin() + best_i + amount);
-        s.sequence.insert(s.sequence.begin() + best_j, bloco.begin(), bloco.end());
+        s.sequence.insert(s.sequence.begin() + best_j, section.begin(), section.end());
 
         s.cost+=bestcost;
         return true;

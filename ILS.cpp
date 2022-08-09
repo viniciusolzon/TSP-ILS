@@ -4,7 +4,7 @@
 
 double epsilon(double a, double b){
     return fabs(a + b) * numeric_limits<double>::epsilon() * 15;
-};
+}
 
 bool improve(double value_1, double value_2){
     return (value_1 - value_2) > epsilon(value_1, value_2);
