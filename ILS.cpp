@@ -49,11 +49,10 @@ Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
                 best = s;
                 iterIls = 0;
             }
-            // s.sequence = Pertubacao(best);
-            // calcularcost(s, d);
+            s = Pertubacao(best, d);
             iterIls++;
         }
-        if (improve(bestOfAll.cost, best.cost)){
+        if(improve(bestOfAll.cost, best.cost)){
             bestOfAll.sequence = best.sequence;
             bestOfAll.cost = best.cost;
         }

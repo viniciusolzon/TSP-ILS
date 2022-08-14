@@ -16,7 +16,3 @@ int main(int argc, char* argv[]){
     Solucao s = solve(s, d, 50, 48);
     exibirSolucao(s, d);
 }
-/*  - Construção: OK
-    - Busca Local: OK
-    - Pertubacao: Falta pertubar as pontas e já atualizar o custo
-*/

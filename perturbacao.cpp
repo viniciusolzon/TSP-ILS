@@ -1,32 +1,128 @@
 #include "ILS.h"
 
-vector<int> Pertubacao(Solucao& s){
-    Solucao best = s;
-    s.sequence.pop_back();
-    int lim = ceil(best.sequence.size() / 10.0);
-    int size1 = max(2, rand() % lim);
-    int start1 = rand() % (best.sequence.size() - size1 + 1);
-    int end1 = start1 + size1 - 1;
-    int size2 = max(2, rand() % lim);
-    int start2 = rand() % (best.sequence.size() - size2 + 1);
-    int end2 = start2 + size2 - 1;
+Solucao Pertubacao(Solucao& s, Data& d){
+    Solucao s_copy;
+    s_copy.sequence = s.sequence;
+    s_copy.cost = s.cost;
 
-    while(end1 + 1 >= start2 || start1 < 1 || start2 < 1 || end1 == best.sequence.size() - 1 || end2 == best.sequence.size() - 1){
-        size1 = max(2, rand() % lim);
-        start1 = rand() % (best.sequence.size() - size1 + 1);
-        end1 = start1 + size1 - 1;
-        size2 = max(2, rand() % lim);
-        start2 = rand() % (best.sequence.size() - size2 + 1);
-        end2 = start2 + size2 - 1;
+    int lim = ceil(s_copy.sequence.size() / 10.0);
+    int coin = rand() % 2;
+
+    double origin = 0.0, after = 0.0, cost = 0.0;
+    origin = d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2]][s_copy.sequence[s_copy.sequence.size() - 1]];
+
+    // cout << "before change s_copy: ";
+    // for(int i = 0; i < s_copy.sequence.size(); i++)
+    //     cout << s_copy.sequence[i] << " ";
+    // cout << "\n";
+
+    s_copy.sequence.pop_back();
+
+    int size1, start1, end1, size2, start2, end2;
+    size1 = max(2, rand() % lim);
+    start1 = rand() % (s_copy.sequence.size() - size1 + 1);
+    end1 = start1 + size1 - 1;
+    size2 = max(2, rand() % lim);
+
+    if(s_copy.sequence.size() - 1 - end1 > size2 && start1 > size2){
+        int coin2 = rand() % 2;
+        if(coin2 == 0){
+            int min = end1 + 2;
+            int max = s_copy.sequence.size() - size2;
+            start2 = rand()%(max - min + 1) + min;
+            end2 = start2 + size2 - 1;
+        }
+        else{
+            int max = start1 - 2;
+            start2 = rand()% max;
+            end2 = start2 + size2 - 1;
+        }
+    }
+    else if(s_copy.sequence.size() - 1 - end1 > size2){
+            int min = end1 + 2;
+            int max = s_copy.sequence.size() - size2;
+            start2 = rand()%(max - min + 1) + min;
+            end2 = start2 + size2 - 1;
+            
+    }   else{
+            int max = start1 - 2;
+            start2 = rand() % max;
+            end2 = start2 + size2 - 1;
     }
 
-    best.sequence.erase(best.sequence.begin() + start1, best.sequence.begin() + start1 + size1);
-    best.sequence.erase(best.sequence.begin() + start2 - size1, best.sequence.begin() + start2 - size1 + size2);
-    for(int i = 0; i < size1; i++)
-        best.sequence.insert(best.sequence.begin() + start1 + i, s.sequence[start2 + i]);
-    for(int i = 0; i < size2; i++)
-        best.sequence.insert(best.sequence.begin() + start2 + i, s.sequence[start1 + i]);
+    vector<int> segment1(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
+    vector<int> segment2(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
 
-    s.sequence.push_back(s.sequence[0]);
-    return best.sequence;
+    if(end1 == s_copy.sequence.size() - 1){
+        origin += d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]];
+        if(start2 == 0){
+            origin += d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end2 + 1]];
+            after = d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end2 + 1]] + d.matrizAdj[s_copy.sequence[start2]][s_copy.sequence[start1 - 1]];
+        }
+        else{
+            origin += d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end2 + 1]];
+            after = d.matrizAdj[s_copy.sequence[start2]][s_copy.sequence[start1 - 1]] + d.matrizAdj[s_copy.sequence[start1]][s_copy.sequence[start2 - 1]] + d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end2 + 1]];
+        }
+    }
+    else if(start1 == 0){
+            origin += d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end1 + 1]];
+            if(end2 == s_copy.sequence.size() - 1){
+                origin += d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]];
+                after = d.matrizAdj[s_copy.sequence[start1]][s_copy.sequence[start2 - 1]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end1 + 1]];
+            }
+            else{
+                origin += d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end2 + 1]];
+                after = d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end1 + 1]] + d.matrizAdj[s_copy.sequence[start1]][s_copy.sequence[start2 - 1]] + d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end2 + 1]];
+            }
+    }   else{
+        origin += d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]] + d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end1 + 1]];
+        if(end2 == s_copy.sequence.size() - 1){
+            origin += d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]];
+            after = d.matrizAdj[s_copy.sequence[start1]][s_copy.sequence[start2 - 1]] + d.matrizAdj[s_copy.sequence[start2]][s_copy.sequence[start1 - 1]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end1 + 1]];
+        }
+        else if(start2 == 0){
+                origin += d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end2 + 1]];
+                after = d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end2 + 1]] + d.matrizAdj[s_copy.sequence[start2]][s_copy.sequence[start1 - 1]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end1 + 1]];
+        }
+            else{
+                origin += d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end2 + 1]];
+                after = d.matrizAdj[s_copy.sequence[start1]][s_copy.sequence[start2 - 1]] + d.matrizAdj[s_copy.sequence[end1]][s_copy.sequence[end2 + 1]] + d.matrizAdj[s_copy.sequence[start2]][s_copy.sequence[start1 - 1]] + d.matrizAdj[s_copy.sequence[end2]][s_copy.sequence[end1 + 1]];
+            }
+    }
+
+    cout << "before change s_copy: ";
+    for(int i = 0; i < s_copy.sequence.size(); i++)
+        cout << s_copy.sequence[i] << " ";
+    cout << "\n";
+
+    if(start1 > start2){
+        s_copy.sequence.erase(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
+        s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
+        s_copy.sequence.erase(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
+        s_copy.sequence.insert(s_copy.sequence.begin() + start2, segment1.begin(), segment1.end());
+    }
+    else{
+        s_copy.sequence.erase(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
+        s_copy.sequence.insert(s_copy.sequence.begin() + start2, segment1.begin(), segment1.end());
+        s_copy.sequence.erase(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
+        s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
+    }
+
+    cout << "post change s_copy: ";
+    for(int i = 0; i < s_copy.sequence.size(); i++)
+        cout << s_copy.sequence[i] << " ";
+    cout << "\n\n";
+
+    s_copy.sequence.push_back(s_copy.sequence[0]);
+
+    // cout << "post change s_copy: ";
+    // for(int i = 0; i < s_copy.sequence.size(); i++)
+    //     cout << s_copy.sequence[i] << " ";
+    // cout << "\n\n";
+
+    after += d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2]][s_copy.sequence[s_copy.sequence.size() - 1]];
+    cost = after - origin;
+    s_copy.cost += cost;
+
+    return s_copy;
 }
