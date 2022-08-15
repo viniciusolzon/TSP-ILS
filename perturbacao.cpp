@@ -10,11 +10,6 @@ Solucao Pertubacao(Solucao& s, Data& d){
     double origin = 0.0, after = 0.0, cost = 0.0;
     origin = d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2]][s_copy.sequence[s_copy.sequence.size() - 1]];
 
-    // cout << "before change s_copy: ";
-    // for(int i = 0; i < s_copy.sequence.size(); i++)
-    //     cout << s_copy.sequence[i] << " ";
-    // cout << "\n";
-
     s_copy.sequence.pop_back();
 
     int size1, start1, end1, size2, start2, end2;
@@ -32,8 +27,8 @@ Solucao Pertubacao(Solucao& s, Data& d){
             end2 = start2 + size2 - 1;
         }
         else{
-            int max = start1 - 2;
-            start2 = rand()% max;
+            int max = start1 - size2 - 1;
+            start2 = rand()% (max + 1);
             end2 = start2 + size2 - 1;
         }
     }
@@ -44,15 +39,10 @@ Solucao Pertubacao(Solucao& s, Data& d){
             end2 = start2 + size2 - 1;
             
     }   else{
-            int max = start1 - 2;
-            start2 = rand() % max;
+            int max = start1 - size2 - 1;
+            start2 = rand()%(max + 1);
             end2 = start2 + size2 - 1;
     }
-
-    cout << "start1: " << start1 << "\n";
-    cout << "end1: " << end1 << "\n";
-    cout << "start2: " << start2 << "\n";
-    cout << "end2: " << end2 << "\n\n";
 
     vector<int> segment1(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
     vector<int> segment2(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
@@ -94,11 +84,6 @@ Solucao Pertubacao(Solucao& s, Data& d){
             }
     }
 
-    cout << "before change s_copy: ";
-    for(int i = 0; i < s_copy.sequence.size(); i++)
-        cout << s_copy.sequence[i] << " ";
-    cout << "\n";
-
     if(start1 > start2){
         s_copy.sequence.erase(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
         s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
@@ -112,22 +97,11 @@ Solucao Pertubacao(Solucao& s, Data& d){
         s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
     }
 
-    cout << "post change s_copy: ";
-    for(int i = 0; i < s_copy.sequence.size(); i++)
-        cout << s_copy.sequence[i] << " ";
-    cout << "\n\n";
-
     s_copy.sequence.push_back(s_copy.sequence[0]);
-
-    // cout << "post change s_copy: ";
-    // for(int i = 0; i < s_copy.sequence.size(); i++)
-    //     cout << s_copy.sequence[i] << " ";
-    // cout << "\n\n";
 
     after += d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2]][s_copy.sequence[s_copy.sequence.size() - 1]];
     cost = after - origin;
     s_copy.cost += cost;
 
     return s_copy;
-    // return s;
 }

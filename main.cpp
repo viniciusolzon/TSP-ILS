@@ -12,7 +12,6 @@ int main(int argc, char* argv[]){
     readData(argc, argv, &dimension, &matrizAdj);
 
     Data d = {matrizAdj, dimension};
-
     Solucao s = solve(s, d, 50, 48);
     exibirSolucao(s, d);
 }

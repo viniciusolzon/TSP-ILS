@@ -39,11 +39,7 @@ Solucao Construcao(Data& d){
         sort(insertioncost.begin(), insertioncost.end(), comparison);
         double alpha = (double) rand() / RAND_MAX;
         int selecionado = rand() % ((int) ceil(alpha * insertioncost.size()));
-        // cout << "Selecionado antes: " << selecionado << "\n";
         selecionado = selecionado != 0 ? rand() % (selecionado) : 0;
-        // cout << "Selecionado depois: " << selecionado << "\n";
-        // cout << "Inserir esse indice: " << insertioncost[selecionado].inserir << "\n";
-        // cout << "Inserir esse valor: " << CL[insertioncost[selecionado].inserir] << "\n";
         chosen = CL[insertioncost[selecionado].inserir];
         s.sequence.insert(s.sequence.begin() + insertioncost[selecionado].remover + 1, chosen);
         CL.erase(CL.begin() + insertioncost[selecionado].inserir);

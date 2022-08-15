@@ -132,13 +132,13 @@ void BuscaLocal(Solucao& s, Data& d){
                 improved = bestImprovement2Opt(s, d);
                 break;
             case 3:
-                improved = bestImprovementOrOpt(s, d, 1); // Reinsertion
+                improved = bestImprovementOrOpt(s, d, 1);
                 break;
             case 4:
-                improved = bestImprovementOrOpt(s, d, 2); // Reinsertion: 2 vertices
+                improved = bestImprovementOrOpt(s, d, 2);
                 break;
             case 5:
-                improved = bestImprovementOrOpt(s, d, 3); // Reinsertion: 3 vertices
+                improved = bestImprovementOrOpt(s, d, 3);
                 break;
         }
         if(improved)
