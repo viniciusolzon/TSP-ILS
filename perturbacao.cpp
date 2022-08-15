@@ -6,7 +6,6 @@ Solucao Pertubacao(Solucao& s, Data& d){
     s_copy.cost = s.cost;
 
     int lim = ceil(s_copy.sequence.size() / 10.0);
-    int coin = rand() % 2;
 
     double origin = 0.0, after = 0.0, cost = 0.0;
     origin = d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2]][s_copy.sequence[s_copy.sequence.size() - 1]];
@@ -20,13 +19,13 @@ Solucao Pertubacao(Solucao& s, Data& d){
 
     int size1, start1, end1, size2, start2, end2;
     size1 = max(2, rand() % lim);
-    start1 = rand() % (s_copy.sequence.size() - size1 + 1);
+    start1 = rand() % (s_copy.sequence.size() - size1 - 1);
     end1 = start1 + size1 - 1;
     size2 = max(2, rand() % lim);
 
     if(s_copy.sequence.size() - 1 - end1 > size2 && start1 > size2){
-        int coin2 = rand() % 2;
-        if(coin2 == 0){
+        int coin = rand() % 2;
+        if(coin == 0){
             int min = end1 + 2;
             int max = s_copy.sequence.size() - size2;
             start2 = rand()%(max - min + 1) + min;
@@ -49,6 +48,11 @@ Solucao Pertubacao(Solucao& s, Data& d){
             start2 = rand() % max;
             end2 = start2 + size2 - 1;
     }
+
+    cout << "start1: " << start1 << "\n";
+    cout << "end1: " << end1 << "\n";
+    cout << "start2: " << start2 << "\n";
+    cout << "end2: " << end2 << "\n\n";
 
     vector<int> segment1(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
     vector<int> segment2(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
@@ -125,4 +129,5 @@ Solucao Pertubacao(Solucao& s, Data& d){
     s_copy.cost += cost;
 
     return s_copy;
+    // return s;
 }

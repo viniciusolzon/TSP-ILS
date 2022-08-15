@@ -251,21 +251,17 @@ Solucao Pertubacao(Solucao& s, Data& d){
     s_copy.sequence = s.sequence;
     s_copy.cost = s.cost;
 
-    cout << "actual s_copy:      ";
-    for(int i = 0; i < s_copy.sequence.size(); i++)
-        cout << s_copy.sequence[i] << " ";
-    cout << "\n";
+    // cout << "actual s_copy:      ";
+    // for(int i = 0; i < s_copy.sequence.size(); i++)
+    //     cout << s_copy.sequence[i] << " ";
+    // cout << "\n";
 
     int lim = ceil(s_copy.sequence.size() / 10.0);
-    int coin = rand() % 2;
 
-    double origin = 0.0, after = 0.0, cost = 0.0;
-    origin = d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2] - 1][s_copy.sequence[s_copy.sequence.size() - 1] - 1];
+    // double origin = 0.0, after = 0.0, cost = 0.0;
+    // origin = d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2] - 1][s_copy.sequence[s_copy.sequence.size() - 1] - 1];
 
-    // if(coin == 0)
-        s_copy.sequence.pop_back();
-    // else
-        // s_copy.sequence.erase(s_copy.sequence.begin());
+    // s_copy.sequence.pop_back();
 
     // cout << "actual s_copy:      ";
     // for(int i = 0; i < s_copy.sequence.size(); i++)
@@ -273,44 +269,38 @@ Solucao Pertubacao(Solucao& s, Data& d){
     // cout << "\n";
 
     int size1, start1, end1, size2, start2, end2;
-    size1 = max(2, rand() % lim);
-    start1 = rand() % (s_copy.sequence.size() - size1 + 1);
+    size1 = std::max(2, rand() % lim);
+    int max = s_copy.sequence.size() - 1 - size1;
+    int min = 1;
+    start1 = rand()%(max - min + 1) + min;
     end1 = start1 + size1 - 1;
-    size2 = max(2, rand() % lim);
+    size2 = std::max(2, rand() % lim);
 
-    // if(s_copy.sequence.size() - 1 - end1 > size2 && start1 >= size2){
-    if(s_copy.sequence.size() - 1 - end1 > size2 && start1 > size2){
-        // cout << "Aqui da na direita e na esquerda\n";
-        int coin2 = rand() % 2;
-        if(coin2 == 0){
-            // cout << "Mas foi sorteado na direita\n";
+    if(s_copy.sequence.size() - 1 - end1 > size2 + 1 && start1 > size2 + 1){
+        int coin = rand() % 2;
+        if(coin == 0){
             int min = end1 + 2;
-            // int min = end1 + 1;
-            int max = s_copy.sequence.size() - size2;
+            int max = s_copy.sequence.size() - size2 - 1;
             start2 = rand()%(max - min + 1) + min;
             end2 = start2 + size2 - 1;
         }
         else{
-            // cout << "Mas foi sorteado na esquerda\n";
-            int max = start1 - 2;
-            // int max = start1 - 1;
-            start2 = rand()% max;
+            int max = start1 - size2 - 1;
+            int min = 1;
+            start2 = rand()%(max - min + 1) + min;
             end2 = start2 + size2 - 1;
         }
     }
     else if(s_copy.sequence.size() - 1 - end1 > size2){
-            // cout << "Aqui da apenas na direita\n";
-            int min = end1 + 2;
-            // int min = end1 + 1;
-            int max = s_copy.sequence.size() - size2;
+            int min = end1 + 1;
+            int max = s_copy.sequence.size() - size2 - 1;
             start2 = rand()%(max - min + 1) + min;
             end2 = start2 + size2 - 1;
             
     }   else{
-            // cout << "Aqui da apenas na esquerda\n";
-            int max = start1 - 2;
-            // int max = start1 - 1;
-            start2 = rand() % max;
+            int max = start1 - size2 - 1;
+            int min = 1;
+            start2 = rand()%(max - min + 1) + min;
             end2 = start2 + size2 - 1;
     }
 
@@ -318,14 +308,6 @@ Solucao Pertubacao(Solucao& s, Data& d){
     // cout << "end1: " << end1 << "\n";
     // cout << "start2: " << start2 << "\n";
     // cout << "end2: " << end2 << "\n\n";
-    // if(start1 == end2 + 1){
-    //     cout << "start2: " << start2 << "\n";
-    //     cout << "start1: " << start1 << "\n\n";
-    // }
-    // if(start2 == end1 + 1){
-    //     cout << "start1: " << start1 << "\n";
-    //     cout << "start2: " << start2 << "\n\n";
-    // }
 
     vector<int> segment1(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
     vector<int> segment2(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
@@ -338,55 +320,66 @@ Solucao Pertubacao(Solucao& s, Data& d){
     //     cout << segment2[i] << " ";
     // cout << "\n";
 
-    // double origin = 0.0, after = 0.0, cost = 0.0;
-    if(end1 == s_copy.sequence.size() - 1){
-        // cout << "1 ta no final\n";
-        origin += d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start1] - 1];
-        if(start2 == 0){
-            // cout << "2 ta no comeco\n";
-            origin += d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
-            after = d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1];
-        }
-        else{
-            // cout << "2 ta no meio\n";
-            origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
-            after = d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1];
-        }
-    }
-    else if(start1 == 0){
-            // cout << "1 ta no comeco\n";
-            origin += d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end1 + 1] - 1];
-            if(end2 == s_copy.sequence.size() - 1){
-                // cout << "2 ta no final\n";
-                origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1];
-                after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
-            }
-            else{
-                // cout << "2 ta no meio\n";
-                origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
-                after = d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1] + d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1];
-            }
-    }   else{
-        // cout << "1 ta no meio\n";
-        origin += d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end1 + 1] - 1];
-        if(end2 == s_copy.sequence.size() - 1){
-            // cout << "2 ta no final\n";
-            origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1];
-            after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
-        }
-        else if(start2 == 0){
-                // cout << "2 ta no comeco\n";
-                origin += d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
-                after = d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
-        }
-            else{
-                // cout << "2 ta no meio tambem\n";
-                origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
-                after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
-            }
-    }
+    // if(end1 == s_copy.sequence.size() - 1){
+    //     // cout << "1 ta no final\n";
+    //     origin += d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start1] - 1];
+    //     if(start2 == 0){
+    //         // cout << "2 ta no comeco\n";
+    //         origin += d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
+    //         after = d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1];
+    //     }
+    //     else{
+    //         // cout << "2 ta no meio\n";
+    //         origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
+    //         after = d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1];
+    //     }
+    // }
+    // else if(start1 == 0){
+    //         // cout << "1 ta no comeco\n";
+    //         origin += d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end1 + 1] - 1];
+    //         if(end2 == s_copy.sequence.size() - 1){
+    //             // cout << "2 ta no final\n";
+    //             origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1];
+    //             after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
+    //         }
+    //         else{
+    //             // cout << "2 ta no meio\n";
+    //             origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
+    //             after = d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1] + d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1];
+    //         }
+    // }   else{
+    //     // cout << "1 ta no meio\n";
+    //     origin += d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end1 + 1] - 1];
+    //     if(end2 == s_copy.sequence.size() - 1){
+    //         // cout << "2 ta no final\n";
+    //         origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1];
+    //         after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
+    //     }
+    //     else if(start2 == 0){
+    //             // cout << "2 ta no comeco\n";
+    //             origin += d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
+    //             after = d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
+    //     }
+    //         else{
+    //             // cout << "2 ta no meio tambem\n";
+    //             origin += d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end2 + 1] - 1];
+    //             after = d.matrizAdj[s_copy.sequence[start1] - 1][s_copy.sequence[start2 - 1] - 1] + d.matrizAdj[s_copy.sequence[end1] - 1][s_copy.sequence[end2 + 1] - 1] + d.matrizAdj[s_copy.sequence[start2] - 1][s_copy.sequence[start1 - 1] - 1] + d.matrizAdj[s_copy.sequence[end2] - 1][s_copy.sequence[end1 + 1] - 1];
+    //         }
+    // }
 
-    if(start1 > start2){
+    double origin = 0.0, after = 0.0, cost = 0.0;
+
+    origin = d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start1] - 1]
+    + d.matrizAdj[s_copy.sequence[start1 + size1 - 1] - 1][s_copy.sequence[start1 + size1] - 1]
+    + d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start2] - 1]
+    + d.matrizAdj[s_copy.sequence[start2 + size2 - 1] - 1][s_copy.sequence[start2 + size2] - 1];
+
+    after = d.matrizAdj[s_copy.sequence[start1 - 1] - 1][s_copy.sequence[start2] - 1]
+    + d.matrizAdj[s_copy.sequence[start2 + size2 - 1] - 1][s_copy.sequence[start1 + size1] - 1]
+    + d.matrizAdj[s_copy.sequence[start2 - 1] - 1][s_copy.sequence[start1] - 1]
+    + d.matrizAdj[s_copy.sequence[start1 + size1 - 1] - 1][s_copy.sequence[start2 + size2] - 1];
+    
+if(start1 > start2){
         s_copy.sequence.erase(s_copy.sequence.begin() + start1, s_copy.sequence.begin() + start1 + size1);
         s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
         s_copy.sequence.erase(s_copy.sequence.begin() + start2, s_copy.sequence.begin() + start2 + size2);
@@ -399,26 +392,18 @@ Solucao Pertubacao(Solucao& s, Data& d){
         s_copy.sequence.insert(s_copy.sequence.begin() + start1, segment2.begin(), segment2.end());
     }
 
-    // if(coin == 0)
-        s_copy.sequence.push_back(s_copy.sequence[0]);
-    // else
-    //     s_copy.sequence.insert(s_copy.sequence.begin(),s_copy.sequence.back());
+    // s_copy.sequence.push_back(s_copy.sequence[0]);
 
-    after += d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2] - 1][s_copy.sequence[s_copy.sequence.size() - 1] - 1];
+    // after += d.matrizAdj[s_copy.sequence[s_copy.sequence.size() - 2] - 1][s_copy.sequence[s_copy.sequence.size() - 1] - 1];
     cost = after - origin;
+    // cout << "Cost: " << cost << endl;
     s_copy.cost += cost;
+    cout << "s_copy.cost: " << s_copy.cost << endl;
 
-    // cout << "origin: " << origin << "\n";
-    // cout << "after: " << after << "\n";
-    // cout << "s_copy.cost before: " << s_copy.cost << "\n";
-    // cout << "cost: " << cost << "\n";
-    // s_copy.cost += cost;
-    // cout << "s_copy.cost after: " << s_copy.cost << "\n\n";
-
-    cout << "post change s_copy: ";
-    for(int i = 0; i < s_copy.sequence.size(); i++)
-        cout << s_copy.sequence[i] << " ";
-    cout << "\n\n";
+    // cout << "post change s_copy: ";
+    // for(int i = 0; i < s_copy.sequence.size(); i++)
+    //     cout << s_copy.sequence[i] << " ";
+    // cout << "\n\n";
 
     return s_copy;
     // return s;
@@ -446,6 +431,10 @@ Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
                 iterIls = 0;
             }
             s = Pertubacao(best, d);
+            // if(s.cost < 0){
+            //     exibirSolucao(s, d);
+            //     break;
+            // }
             iterIls++;
         }
         if (improve(bestOfAll.cost, best.cost)){
@@ -480,5 +469,7 @@ int main(){
     
     Solucao s = solve(s, d, 50, 12);
     exibirSolucao(s, d);
+    // for(int i = 0; i < 10; i++)
+    // cout << rand()%(10 - 1 + 1) + 1 << endl;
 
 }
