@@ -61,5 +61,6 @@ Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
     chrono::duration<double, milli> float_ms = end - start;
     cout << "\nExecution time:  " << float_ms.count() / 1000.0000000000000 << " seconds" << "\n";
     cout << "Sequence size:  " << bestOfAll.sequence.size() - 1 << "\n";
+    
     return bestOfAll;
 }
