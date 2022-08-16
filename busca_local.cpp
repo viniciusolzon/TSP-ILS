@@ -56,7 +56,7 @@ bool bestImprovement2Opt(Solucao &s, Data &d){
     for(int i = 1; i < s.sequence.size() - 2; i++){
         for(int j = i + 1; j < s.sequence.size() - 1; j++){
             cost = calculate2OptCost(s, d, i, j);
-            if (cost < bestcost){
+            if(improve(bestcost, cost)){
                 best_i = i;
                 best_j = j;
                 bestcost = cost;
