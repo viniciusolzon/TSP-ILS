@@ -12,6 +12,6 @@ int main(int argc, char* argv[]){
     readData(argc, argv, &dimension, &matrizAdj);
 
     Data d = {matrizAdj, dimension};
-    Solucao s = solve(s, d, 50, 48);
+    Solucao s = solve(s, d, 50, d.vertices >= 150 ? d.vertices / 2 : d.vertices);
     exibirSolucao(s, d);
 }
