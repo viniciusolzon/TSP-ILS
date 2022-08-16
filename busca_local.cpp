@@ -30,7 +30,7 @@ bool bestImprovementSwap(Solucao &s, Data& d){
             }
         }
     }
-    if(bestcost < 0){
+    if(improve(bestcost, 0)){
         int aux = s.sequence[best_i];
         s.sequence[best_i] = s.sequence[best_j];
         s.sequence[best_j] = aux;
@@ -63,7 +63,7 @@ bool bestImprovement2Opt(Solucao &s, Data &d){
             }
         }
     }
-    if(bestcost < 0){
+    if(improve(bestcost, 0)){
         reverse(s.sequence.begin() + best_i, s.sequence.begin() + best_j + 1);
 
         s.cost+=bestcost;
@@ -107,7 +107,7 @@ bool bestImprovementOrOpt(Solucao &s, Data &d, int amount){
         }
     }
 
-    if(bestcost < 0){
+    if(improve(bestcost, 0)){
         vector<int> section(s.sequence.begin() + best_i, s.sequence.begin() + best_i  + amount);
         s.sequence.erase(s.sequence.begin() + best_i, s.sequence.begin() + best_i + amount);
         s.sequence.insert(s.sequence.begin() + best_j, section.begin(), section.end());
