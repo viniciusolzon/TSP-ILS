@@ -10,16 +10,19 @@ Solucao Construcao(Data& d){
     Solucao s;
     vector<int> CL;
 
-    for (int i = 1; i <= d.vertices; i++){
+    for (int i = 2; i <= d.vertices; i++){
         CL.push_back(i);
     }
+
+    s.sequence = {1};
 
     random_shuffle(CL.begin(), CL.end());
     for(int i = 0; i < 3; i++){
         s.sequence.push_back(CL[i]);
         CL.erase(CL.begin() + i);
     }
-    s.sequence.push_back(s.sequence[0]);
+
+    s.sequence.push_back(1);
 
     int chosen;
     while(!CL.empty()){

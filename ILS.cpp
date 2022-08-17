@@ -35,17 +35,12 @@ Solucao solve(Solucao& s, Data& d, int maxIter, int maxIterIls){
         calcularcost(s, d);
         Solucao best = s;
         if(i == 0){
-            // bestOfAll.sequence = s.sequence;
-            // bestOfAll.cost = s.cost;
             bestOfAll = s;
         }
         int iterIls = 0;
-        cout << "Iteração:      " << i + 1 << "\n"; // debug
         while(iterIls <= maxIterIls){
             BuscaLocal(s, d);
             if(improve(best.cost, s.cost)){
-                // best.sequence = s.sequence;
-                // best.cost = s.cost;
                 best = s;
                 iterIls = 0;
             }
