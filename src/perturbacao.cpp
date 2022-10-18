@@ -1,9 +1,9 @@
 #include "ILS.h"
 
-Solucao Pertubacao(Solucao& s, Data& d){
+Solucao ILS :: Pertubacao(Solucao *s, Data *d){
     Solucao s_copy;
-    s_copy.sequence = s.sequence;
-    s_copy.cost = s.cost;
+    s_copy.sequence = s->sequence;
+    s_copy.cost = s->cost;
 
     int lim = ceil(s_copy.sequence.size() / 10.0);
 
@@ -46,33 +46,33 @@ Solucao Pertubacao(Solucao& s, Data& d){
     double origin, after, cost;
 
     if(start1 + size1 == start2){
-        origin = d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]]
-        + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2]]
-        + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start2 + size2]];
+        origin = d->matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]]
+        + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2]]
+        + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start2 + size2]];
 
-        after = d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start2]]
-        + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1]]
-        + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2 + size2]];
+        after = d->matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start2]]
+        + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1]]
+        + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2 + size2]];
     }
     else if(start2 + size2 == start1){
-        origin = d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]]
-        + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1]]
-        + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start1 + size1]];
+        origin = d->matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]]
+        + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1]]
+        + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start1 + size1]];
          
-        after = d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start1]]
-        + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2]]
-        + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1 + size1]];
+        after = d->matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start1]]
+        + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2]]
+        + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1 + size1]];
     }
         else{
-            origin = d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]]
-            + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start1 + size1]]
-            + d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]]
-            + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start2 + size2]];
+            origin = d->matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start1]]
+            + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start1 + size1]]
+            + d->matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start2]]
+            + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start2 + size2]];
 
-            after = d.matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start2]]
-            + d.matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1 + size1]]
-            + d.matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start1]]
-            + d.matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2 + size2]];
+            after = d->matrizAdj[s_copy.sequence[start1 - 1]][s_copy.sequence[start2]]
+            + d->matrizAdj[s_copy.sequence[start2 + size2 - 1]][s_copy.sequence[start1 + size1]]
+            + d->matrizAdj[s_copy.sequence[start2 - 1]][s_copy.sequence[start1]]
+            + d->matrizAdj[s_copy.sequence[start1 + size1 - 1]][s_copy.sequence[start2 + size2]];
     }
 
     if(start1 > start2){
