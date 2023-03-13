@@ -1,1 +1,1 @@
-obj/readData.o: src/readData.cpp
+obj/readData.o: src/readData.cpp src/ILS.h
